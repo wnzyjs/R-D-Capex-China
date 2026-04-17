@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>China Chemicals R&amp;D CAPEX Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --bg-soft: #fbf8f2;
+      --ink: #16242d;
+      --muted: #5f6c72;
+      --line: rgba(22, 36, 45, 0.12);
+      --navy: #17364d;
+      --teal: #1d7668;
+      --amber: #cb7b2c;
+      --rust: #a64a3d;
+      --olive: #6f7b3a;
+      --shadow: 0 18px 50px rgba(23, 54, 77, 0.08);
+      --radius: 24px;
+      --radius-sm: 16px;
+      --max: 1280px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(203, 123, 44, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(29, 118, 104, 0.12), transparent 32%),
+        linear-gradient(180deg, #f8f4eb 0%, #f1ebe0 100%);
+    }
+
+    a {
+      color: var(--navy);
+    }
+
+    .shell {
+      width: min(calc(100% - 32px), var(--max));
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 40px 0 28px;
+    }
+
+    .hero-panel {
+      position: relative;
+      overflow: hidden;
+      padding: 36px;
+      border-radius: 32px;
+      background:
+        linear-gradient(135deg, rgba(23, 54, 77, 0.97), rgba(21, 60, 53, 0.92)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent);
+      color: #f7f1e7;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-panel::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -120px auto;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(203, 123, 44, 0.35), transparent 68%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 6px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      line-height: 1.05;
+      font-weight: 700;
+    }
+
+    h1 {
+      max-width: 920px;
+      font-size: clamp(2.4rem, 5vw, 4.8rem);
+      letter-spacing: -0.04em;
+    }
+
+    .hero-copy {
+      max-width: 880px;
+      margin-top: 18px;
+      font-size: 1.08rem;
+      line-height: 1.65;
+      color: rgba(247, 241, 231, 0.88);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .meta-chip {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(247, 241, 231, 0.92);
+      font-size: 0.95rem;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      backdrop-filter: blur(10px);
+      background: rgba(244, 239, 230, 0.85);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav-inner {
+      width: min(calc(100% - 32px), var(--max));
+      margin: 0 auto;
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 14px 0;
+    }
+
+    .nav a {
+      white-space: nowrap;
+      text-decoration: none;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.68);
+    }
+
+    main {
+      padding: 24px 0 48px;
+    }
+
+    section {
+      margin-bottom: 24px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(251, 248, 242, 0.9);
+      box-shadow: var(--shadow);
+    }
+
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 22px;
+    }
+
+    .section-kicker {
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+      max-width: 760px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 10px 0 0;
+    }
+
+    .kpi-grid,
+    .takeaway-grid,
+    .case-grid,
+    .priority-grid,
+    .signals {
+      display: grid;
+      gap: 16px;
+    }
+
+    .kpi-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .takeaway-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .case-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .priority-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .signals {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card,
+    .case-study,
+    .signal,
+    .priority {
+      padding: 20px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.56));
+    }
+
+    .card strong,
+    .case-study strong,
+    .signal strong,
+    .priority strong {
+      display: block;
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+    }
+
+    .case-study {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .case-top {
+      padding: 20px 20px 14px;
+      background: linear-gradient(135deg, rgba(23, 54, 77, 0.08), rgba(29, 118, 104, 0.07));
+      border-bottom: 1px solid var(--line);
+    }
+
+    .case-company {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .case-company h3 {
+      font-size: 1.4rem;
+      letter-spacing: -0.03em;
+    }
+
+    .case-date {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .case-tag {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(23, 54, 77, 0.08);
+      color: var(--navy);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+    }
+
+    .case-body {
+      padding: 20px;
+    }
+
+    .case-block + .case-block {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .case-label {
+      margin-bottom: 6px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .case-body p {
+      margin: 0;
+      line-height: 1.65;
+    }
+
+    .kpi {
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 22px;
+      border-radius: 22px;
+      color: #fbf8f2;
+      background: linear-gradient(155deg, var(--navy), #1a5a57);
+    }
+
+    .kpi:nth-child(2) {
+      background: linear-gradient(155deg, #725012, var(--amber));
+    }
+
+    .kpi:nth-child(3) {
+      background: linear-gradient(155deg, #6c2f2f, var(--rust));
+    }
+
+    .kpi:nth-child(4) {
+      background: linear-gradient(155deg, #415622, var(--olive));
+    }
+
+    .kpi-label {
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(251, 248, 242, 0.72);
+    }
+
+    .kpi-value {
+      margin: 10px 0 12px;
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .kpi-note {
+      color: rgba(251, 248, 242, 0.84);
+      line-height: 1.55;
+      font-size: 0.96rem;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+
+    th,
+    td {
+      padding: 16px;
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    th {
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: rgba(23, 54, 77, 0.04);
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .pill.high {
+      background: rgba(29, 118, 104, 0.12);
+      color: var(--teal);
+    }
+
+    .pill.medium {
+      background: rgba(203, 123, 44, 0.12);
+      color: var(--amber);
+    }
+
+    .pill.low {
+      background: rgba(166, 74, 61, 0.12);
+      color: var(--rust);
+    }
+
+    ul.clean {
+      margin: 0;
+      padding-left: 18px;
+      line-height: 1.7;
+    }
+
+    .source-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .source-item {
+      padding: 16px 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.68);
+    }
+
+    .source-item strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .footer-note {
+      padding: 22px 0 12px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.96rem;
+    }
+
+    @media (max-width: 1080px) {
+      .kpi-grid,
+      .takeaway-grid,
+      .case-grid,
+      .priority-grid,
+      .signals {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .hero-panel,
+      section {
+        padding: 22px;
+      }
+
+      .kpi-grid,
+      .takeaway-grid,
+      .case-grid,
+      .priority-grid,
+      .signals {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-inner {
+        padding: 12px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero shell">
+    <div class="hero-panel">
+      <div class="eyebrow">China Chemicals Intelligence</div>
+      <h1>R&amp;D CAPEX investments in China for the chemicals industry</h1>
+      <p class="hero-copy">
+        A focused dashboard built around the questions most relevant to Nouryon: how much has been invested, what kind of R&amp;D or pilot infrastructure was built, which capabilities were added, and where the public record does or does not reveal high-hazard safety features.
+      </p>
+      <div class="meta">
+        <span class="meta-chip">Prepared for Nouryon-related screening</span>
+        <span class="meta-chip">Updated April 17, 2026</span>
+        <span class="meta-chip">Scope: China with competitor appendix</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#snapshot">Snapshot</a>
+      <a href="#dashboard">Benchmark Dashboard</a>
+      <a href="#case-studies">Case Studies</a>
+      <a href="#safety">Safety Read-Across</a>
+      <a href="#peroxides">Organic Peroxides</a>
+      <a href="#alkyls">Metal Alkyls</a>
+      <a href="#priority">One-Pager Priority</a>
+      <a href="#sources">Sources</a>
+    </div>
+  </nav>
+
+  <main class="shell">
+    <section id="snapshot">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">At A Glance</div>
+          <h2>What stands out in the public record</h2>
+          <p class="section-subtitle">
+            The strongest public China R&amp;D CAPEX benchmarks are concentrated in Shanghai and the Yangtze River Delta. Public disclosures tend to describe facility type and lab capability in some detail, but they rarely disclose exact hazardous-lab hardware.
+          </p>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <article class="kpi">
+          <div class="kpi-label">Largest Disclosed China Benchmark</div>
+          <div class="kpi-value">&gt; RMB 4bn</div>
+          <div class="kpi-note">Solvay disclosed more than RMB 4 billion invested in its China Research &amp; Innovation hub since 2005.</div>
+        </article>
+        <article class="kpi">
+          <div class="kpi-label">Most Specialized Public Lab Footprint</div>
+          <div class="kpi-value">Clariant</div>
+          <div class="kpi-note">One Clariant Campus combines more than 13,000 m2 of labs with a dedicated catalyst center and multi-scale testing.</div>
+        </article>
+        <article class="kpi">
+          <div class="kpi-label">Most Segment-Relevant Benchmark</div>
+          <div class="kpi-value">Nouryon</div>
+          <div class="kpi-note">The 2025 China buildout adds both an organic peroxides innovation center and metal alkyl lab capability.</div>
+        </article>
+        <article class="kpi">
+          <div class="kpi-label">Safety Disclosure Gap</div>
+          <div class="kpi-value">High</div>
+          <div class="kpi-note">No reviewed official source explicitly disclosed blast chambers, detonation cells, or bunkerized explosive test rooms.</div>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Takeaways</div>
+          <h2>Key messages for a Nouryon-facing discussion</h2>
+        </div>
+      </div>
+
+      <div class="takeaway-grid">
+        <article class="card">
+          <strong>China R&amp;D CAPEX is real, but disclosures are uneven.</strong>
+          Large multinationals such as BASF, Solvay, Clariant, and Arkema provide useful reference points on scale and lab capability, while many smaller competitor disclosures are sparse.
+        </article>
+        <article class="card">
+          <strong>Public data is strongest on applications and pilot capability.</strong>
+          Process labs, automation labs, pilot halls, catalyst prep, and application-development spaces are often described. Safety-specific infrastructure usually is not.
+        </article>
+        <article class="card">
+          <strong>Arkema is the strongest external organic-peroxide benchmark.</strong>
+          Its Changshu site explicitly combines production and R&amp;D, and Luperox organic peroxides are part of the site narrative.
+        </article>
+        <article class="card">
+          <strong>LANXESS is the strongest China-adjacent metal-alkyl screen.</strong>
+          It has a sizable China R&amp;D footprint overall, even though this review did not isolate a public China metal-alkyl application center.
+        </article>
+      </div>
+    </section>
+
+    <section id="dashboard">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Core Benchmark Set</div>
+          <h2>China chemicals R&amp;D CAPEX dashboard</h2>
+          <p class="section-subtitle">
+            This is the short list of the most useful public benchmarks when the goal is to discuss recent investment size, lab type, and capability build-out in China.
+          </p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Announcement date</th>
+              <th>Investment disclosed</th>
+              <th>China facility / lab type</th>
+              <th>Capabilities disclosed</th>
+              <th>Safety relevance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>BASF</strong></td>
+              <td>June 28, 2023</td>
+              <td>Around EUR 280 million invested in Innovation Campus Shanghai since 2012</td>
+              <td>Two new R&amp;D buildings at BASF Innovation Campus Shanghai</td>
+              <td>Process engineering for solids handling, polymer recycling, robotic lab automation, cleaning-process labs, performance materials lab, Creator's Lab</td>
+              <td>Good process benchmark, but no public blast-room or explosive-material disclosure</td>
+            </tr>
+            <tr>
+              <td><strong>Solvay</strong></td>
+              <td>September 6, 2023</td>
+              <td>More than RMB 4 billion invested in China R&amp;I hub since 2005</td>
+              <td>New research building at Solvay Shanghai Technology Park</td>
+              <td>State-of-the-art laboratories, pilot hall, automation and robotics lab, industrial and consumer application spaces</td>
+              <td>Pilot-hall language suggests stronger process controls, but no explosive-lab specifics</td>
+            </tr>
+            <tr>
+              <td><strong>Clariant</strong></td>
+              <td>March 18 and March 22, 2021</td>
+              <td>CHF 45 million for One Clariant Campus in Shanghai</td>
+              <td>24,000 m2 campus with more than 13,000 m2 of labs, including catalyst R&amp;D center</td>
+              <td>Catalyst preparation, characterization, chemical analysis, and performance testing at various scales</td>
+              <td>Best specialized lab benchmark; still no public blast-chamber detail</td>
+            </tr>
+            <tr>
+              <td><strong>Arkema</strong></td>
+              <td>September 6, 2023</td>
+              <td>Around EUR 600 million capex invested in Changshu platform</td>
+              <td>Integrated production, R&amp;D, and regional shared-service platform; Changshu R&amp;D Center is Arkema's largest in Asia</td>
+              <td>Local solution development, clean-energy applications, CNAS-accredited lab, Luperox organic peroxides highlighted as mission-critical additives</td>
+              <td>Strong segment relevance for organic peroxides; no public blast-cell detail</td>
+            </tr>
+            <tr>
+              <td><strong>Nouryon</strong></td>
+              <td>October 16 and November 10, 2025</td>
+              <td>Amount not disclosed</td>
+              <td>New Shanghai innovation center, 2026 organic peroxides innovation center in Tianjin, Jiaxing metal alkyl lab established in 2024</td>
+              <td>Eight specialized Shanghai labs, expanded testing and analytics, polymer application capability, process-efficiency and new production-method work in metal alkyls</td>
+              <td>Most directly relevant segment benchmark, but safety infrastructure is only described indirectly</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="case-studies">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Consulting Summary</div>
+          <h2>Four summarized case studies</h2>
+          <p class="section-subtitle">
+            These four cases are written in a more consulting-style format so the story is easier to use in workshops, steering discussions, or one-page exec summaries.
+          </p>
+        </div>
+      </div>
+
+      <div class="case-grid">
+        <article class="case-study">
+          <div class="case-top">
+            <div class="case-company">
+              <h3>BASF</h3>
+              <span class="case-tag">Scale benchmark</span>
+            </div>
+            <div class="case-date">Announcement date: June 28, 2023</div>
+          </div>
+          <div class="case-body">
+            <div class="case-block">
+              <div class="case-label">Situation</div>
+              <p>BASF expanded its Innovation Campus Shanghai to deepen Asia-based R&amp;D and move beyond formulation support into more advanced engineering and digital-lab capability.</p>
+            </div>
+            <div class="case-block">
+              <div class="case-label">Investment And Build</div>
+              <p>BASF disclosed around EUR 280 million invested in the Shanghai campus since 2012, including two new R&amp;D buildings.</p>
+            </div>
+            <div class="case-block">
+              <div class="case-label">Capability Added</div>
+              <p>The buildout added solids-handling process engineering, polymer recycling work, robotic automation for dispersions and resins, cleaning-process labs, and performance-materials testing.</p>
+            </div>
+            <div class="case-block">
+              <div class="case-label">Why It Matters</div>
+              <p>This is the clearest public benchmark for how a top-tier chemicals player scales China R&amp;D into a multi-capability innovation campus, even though safety hardware is not disclosed in detail.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="case-study">
+          <div class="case-top">
+            <div class="case-company">
+              <h3>Solvay</h3>
+              <span class="case-tag">Pilot model</span>
+            </div>
+            <div class="case-date">Announcement date: September 6, 2023</div>
+          </div>
+          <div class="case-body">
+            <div class="case-block">
+              <div class="case-label">Situation</div>
+              <p>Solvay continued building out its Shanghai R&amp;I platform to support industrial applications and faster localization for advanced materials customers in China.</p>
+            </div>
+            <div class="case-block">
+              <div class="case-label">Investment And Build</div>
+              <p>Solvay disclosed more than RMB 4 billion invested in its China Research &amp; Innovation hub since 2005 and opened a new research building at Shanghai Technology Park.</p>
+            </div>
+            <div class="case-block">
+              <div class="case-label">Capability Added</div>
+              <p>The new building includes several laboratories, an automation and robotics lab, and a pilot hall for advanced-materials applications serving sectors such as electronics, semiconductors, and new energy.</p>
+            </div>
+            <div class="case-block">
+              <div class="case-label">Why It Matters</div>
+              <p>It is a strong example of a China R&amp;D model that bridges bench science and pilot validation, which is highly relevant when thinking about scale-up intensity rather than only lab count.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="case-study">
+          <div class="case-top">
+            <div class="case-company">
+              <h3>Clariant</h3>
+              <span class="case-tag">Specialized lab</span>
+            </div>
+            <div class="case-date">Announcement dates: March 18 and March 22, 2021</div>
+          </div>
+          <div class="case-body">
+            <div class="case-block">
+              <div class="case-label">Situation</div>
+              <p>Clariant used One Clariant Campus in Shanghai to consolidate innovation activity and anchor a more specialized R&amp;D footprint in China.</p>
+            </div>
+            <div class="case-block">
+              <div class="case-label">Investment And Build</div>
+              <p>Clariant disclosed CHF 45 million for the campus, with total floor space of about 24,000 m2 and more than 13,000 m2 of laboratory area, including a dedicated catalyst R&amp;D center.</p>
+            </div>
+            <div class="case-block">
+              <div class="case-label">Capability Added</div>
+              <p>The catalyst center spans three lab units and supports catalyst preparation, characterization, chemical analysis, and performance testing at multiple scales.</p>
+            </div>
+            <div class="case-block">
+              <div class="case-label">Why It Matters</div>
+              <p>This is the most specific public case on lab footprint and capability depth, making it especially valuable as an analog for technically demanding specialty-chemicals work.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="case-study">
+          <div class="case-top">
+            <div class="case-company">
+              <h3>Arkema</h3>
+              <span class="case-tag">Best competitor analog</span>
+            </div>
+            <div class="case-date">Announcement date: September 6, 2023</div>
+          </div>
+          <div class="case-body">
+            <div class="case-block">
+              <div class="case-label">Situation</div>
+              <p>Arkema continued investing in Changshu as an integrated China platform combining industrial assets, regional support functions, and the company's largest R&amp;D center in Asia.</p>
+            </div>
+            <div class="case-block">
+              <div class="case-label">Investment And Build</div>
+              <p>Arkema disclosed around EUR 600 million of capex invested in the Changshu platform, which combines production and R&amp;D infrastructure rather than a stand-alone lab project.</p>
+            </div>
+            <div class="case-block">
+              <div class="case-label">Capability Added</div>
+              <p>The site supports local solution development, clean-energy applications, and CNAS-accredited lab work, with Luperox organic peroxides explicitly highlighted among the mission-critical technologies on site.</p>
+            </div>
+            <div class="case-block">
+              <div class="case-label">Why It Matters</div>
+              <p>For a Nouryon lens, this is the strongest external competitor analog because it ties China R&amp;D directly to an organic-peroxides-relevant industrial platform, even though high-hazard lab hardware is not publicly described.</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="safety">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Safety Lens</div>
+          <h2>What we can and cannot say about hazardous-lab infrastructure</h2>
+          <p class="section-subtitle">
+            For organic peroxides, blast chambers, explosion-proof cells, and bunkerized testing rooms would be especially valuable datapoints. The reviewed public sources did not disclose those specifics, so the strongest read-across comes from operating language and adjacent infrastructure disclosures.
+          </p>
+        </div>
+      </div>
+
+      <div class="signals">
+        <article class="signal">
+          <strong>Nouryon Tianjin organic peroxides site</strong>
+          The December 1, 2021 announcement says the site uses the latest technology for safety, energy efficiency, and environmental protection. This is the clearest segment-specific safety signal, but not a hardware-level description.
+        </article>
+        <article class="signal">
+          <strong>Nouryon Jiaxing metal alkyl expansion</strong>
+          The October 16, 2025 disclosure references advanced thermal oxidizer systems plus blending and cylinder-transfilling capability, which shows hazardous-material handling investment beyond basic synthesis.
+        </article>
+        <article class="signal">
+          <strong>United Initiators Hefei</strong>
+          UI describes improved local process and higher HSE operating standards. That is useful context for competitor maturity, even though it is not framed as an R&amp;D center.
+        </article>
+        <article class="signal">
+          <strong>Public-data gap</strong>
+          No official source reviewed here explicitly mentions blast chambers, detonation cells, or bunkerized explosive test rooms in China R&amp;D centers.
+        </article>
+      </div>
+    </section>
+
+    <section id="peroxides">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Competitor Screen</div>
+          <h2>Organic peroxides</h2>
+          <p class="section-subtitle">
+            This screen separates competitors with useful China evidence from names that currently look more like research gaps than strong public benchmarks.
+          </p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Public China footprint</th>
+              <th>R&amp;D / investment signal</th>
+              <th>Priority read</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Arkema</strong><br><span class="pill high">Tier 1</span></td>
+              <td>Strong. Changshu integrates production and R&amp;D in China.</td>
+              <td>Around EUR 600 million cumulative capex in Changshu; largest Arkema R&amp;D center in Asia; Luperox organic peroxides explicitly referenced.</td>
+              <td>Highest-priority external benchmark for Nouryon in China.</td>
+            </tr>
+            <tr>
+              <td><strong>United Initiators</strong><br><span class="pill high">Tier 1</span></td>
+              <td>Moderate. Shanghai commercial arm and Hefei production footprint.</td>
+              <td>No public China R&amp;D center found; ESG page says more than 45% of running R&amp;D projects address sustainability issues.</td>
+              <td>Worth a one-pager focused on footprint and operating model.</td>
+            </tr>
+            <tr>
+              <td><strong>AKPA Kimya</strong><br><span class="pill medium">Tier 2</span></td>
+              <td>No clear public China site found.</td>
+              <td>Turkey-centered R&amp;D investment with company-level disclosure on R&amp;D center, labs, and historical spending.</td>
+              <td>Useful global challenger profile, weak China evidence.</td>
+            </tr>
+            <tr>
+              <td><strong>Pergan</strong><br><span class="pill low">Gap</span></td>
+              <td>No clear public China footprint found in this review.</td>
+              <td>No public China R&amp;D evidence found.</td>
+              <td>Low priority unless the team has a specific local angle.</td>
+            </tr>
+            <tr>
+              <td><strong>NOF</strong><br><span class="pill low">Gap</span></td>
+              <td>No clear China R&amp;D center found in this review.</td>
+              <td>Public materials skew toward Japan-centered specialty development.</td>
+              <td>Technically relevant competitor, but China evidence is weak.</td>
+            </tr>
+            <tr>
+              <td><strong>Daoming / Chinasun (QS) / Dongsung</strong><br><span class="pill low">Gap</span></td>
+              <td>Identity or China footprint not confidently verified from accessible public sources.</td>
+              <td>No reliable China R&amp;D footprint identified in the reviewed source set.</td>
+              <td>Research gap rather than benchmark case.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="alkyls">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Competitor Screen</div>
+          <h2>Metal alkyls</h2>
+          <p class="section-subtitle">
+            The named set is thinner on public China-specific R&amp;D disclosures than the organic-peroxide side, so the most useful output here is relative prioritization.
+          </p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Public China footprint</th>
+              <th>R&amp;D / investment signal</th>
+              <th>Priority read</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>LANXESS</strong><br><span class="pill high">Tier 1</span></td>
+              <td>Strong. LANXESS said on April 9, 2025 that it has 10 subsidiaries with eight R&amp;D centers and production sites in China.</td>
+              <td>Strong overall China R&amp;D presence, though no public China metal-alkyl application center was identified in this review.</td>
+              <td>Highest-priority metal-alkyl-adjacent one-pager after Nouryon.</td>
+            </tr>
+            <tr>
+              <td><strong>Albemarle (previously Ketjen)</strong><br><span class="pill medium">Tier 2</span></td>
+              <td>Strong general China commercial and operating footprint.</td>
+              <td>Reviewed public materials show China operations, but the clearly disclosed R&amp;D site in the source set is Baton Rouge, not China.</td>
+              <td>Important global player, but weak public China R&amp;D evidence.</td>
+            </tr>
+            <tr>
+              <td><strong>Gulbrandsen</strong><br><span class="pill medium">Tier 2</span></td>
+              <td>No public China manufacturing or R&amp;D footprint found in this review.</td>
+              <td>March 7, 2023 aluminum-alkyl plant investment in Dahej, India; strong organometallic product-stewardship and safety messaging.</td>
+              <td>Useful global benchmark, not a China R&amp;D benchmark.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="priority">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Recommended Build Order</div>
+          <h2>Which one-pagers to do first</h2>
+          <p class="section-subtitle">
+            If the goal is maximum signal with minimum effort, start with the names below in order. They offer the best mix of China relevance, segment fit, and public evidence.
+          </p>
+        </div>
+      </div>
+
+      <div class="priority-grid">
+        <article class="priority">
+          <strong>Tier 1</strong>
+          <ul class="clean">
+            <li>Arkema</li>
+            <li>Nouryon benchmark page</li>
+            <li>LANXESS</li>
+            <li>United Initiators</li>
+          </ul>
+        </article>
+        <article class="priority">
+          <strong>Tier 2</strong>
+          <ul class="clean">
+            <li>Albemarle</li>
+            <li>Gulbrandsen</li>
+            <li>AKPA Kimya</li>
+          </ul>
+        </article>
+        <article class="priority">
+          <strong>Research Gap</strong>
+          <ul class="clean">
+            <li>Pergan</li>
+            <li>NOF</li>
+            <li>Daoming</li>
+            <li>Chinasun (QS)</li>
+            <li>Dongsung</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Source Base</div>
+          <h2>Official sources used in the dashboard</h2>
+        </div>
+      </div>
+
+      <div class="source-list">
+        <article class="source-item">
+          <strong>China R&amp;D CAPEX benchmarks</strong>
+          <a href="https://www.basf.com/global/en/media/news-releases/2023/06/p-23-249" target="_blank" rel="noreferrer">BASF, June 28, 2023</a><br />
+          <a href="https://www.solvay.com/en/press-release/solvay-expands-china-research-and-innovation-center-and-inaugurates-its-new-building" target="_blank" rel="noreferrer">Solvay, September 6, 2023</a><br />
+          <a href="https://www.clariant.com/en/Corporate/News/2021/03/Clariant-strengthens-position-in-China-with-inauguration-of-One-Clariant-Campus" target="_blank" rel="noreferrer">Clariant, March 18, 2021</a><br />
+          <a href="https://www.clariant.com/en/Corporate/News/2021/03/Clariant-opens-stateoftheart-catalyst-China-RampD-center-at-its-new-Shanghai-One-Clariant-Campus" target="_blank" rel="noreferrer">Clariant, March 22, 2021</a><br />
+          <a href="https://www.arkema.com/global/en/media/newslist/news/global/corporate/2023/20230906-changshu-site-rd-center-anniversary/" target="_blank" rel="noreferrer">Arkema, September 6, 2023</a><br />
+          <a href="https://www.nouryon.com/news-and-events/news-overview/2025/nouryon-expands-polymer-specialties-leadership-with-metal-alkyls-capacity-increase-new-mmao-production-capability-and-organic-peroxides-innovation-center-in-china/" target="_blank" rel="noreferrer">Nouryon, October 16, 2025</a><br />
+          <a href="https://www.nouryon.com/news-and-events/news-overview/2025/nouryon-opens-new-innovation-center-in-shanghai-to-accelerate-localized-innovation-and-customer-collaboration-in-china" target="_blank" rel="noreferrer">Nouryon, November 10, 2025</a><br />
+          <a href="https://www.nouryon.com/news-and-events/news-overview/2021/nouryon-begins-production-at-advanced-organic-peroxide-greenfield-site-to-support-the-polymer-industry-in-asia2" target="_blank" rel="noreferrer">Nouryon, December 1, 2021</a>
+        </article>
+
+        <article class="source-item">
+          <strong>Competitor screen sources</strong>
+          <a href="https://www.united-initiators.com/en/company/locations/china-hefei" target="_blank" rel="noreferrer">United Initiators, Hefei</a><br />
+          <a href="https://www.united-initiators.com/en/company/locations/china-shanghai" target="_blank" rel="noreferrer">United Initiators, Shanghai</a><br />
+          <a href="https://www.united-initiators.com/en/responsibility" target="_blank" rel="noreferrer">United Initiators, ESG / Responsibility</a><br />
+          <a href="https://akpakimya.com/en/corporate/about-us" target="_blank" rel="noreferrer">AKPA Kimya, About Us</a><br />
+          <a href="https://www.akpakimya.com/en/r-d-and-innovation" target="_blank" rel="noreferrer">AKPA Kimya, R&amp;D and Innovation</a><br />
+          <a href="https://akpakimya.com/index.php/en/2028-strategy" target="_blank" rel="noreferrer">AKPA Kimya, 2028 Strategy</a><br />
+          <a href="https://www.albemarle.com/global/en/who-we-are/global-locations" target="_blank" rel="noreferrer">Albemarle, Global Locations</a><br />
+          <a href="https://lanxess.com/-/media/project/lanxess/corporate-internet/media/press-releases/china-en-press-release/2025/04/lanxess-celebrates-20-years-building-a-sustainable-future-in-china.pdf" target="_blank" rel="noreferrer">LANXESS, April 9, 2025</a><br />
+          <a href="https://gulbrandsen.com/gulbrandsen-inaugurates-a-new-aluminum-alkyls-plant-in-dahej-india/" target="_blank" rel="noreferrer">Gulbrandsen, March 7, 2023</a><br />
+          <a href="https://gulbrandsen.com/products/organometallics/" target="_blank" rel="noreferrer">Gulbrandsen, Organometallics</a>
+        </article>
+      </div>
+
+      <div class="footer-note">
+        Where the dashboard says that no public China R&amp;D evidence was found, that means no reliable disclosure was identified in this review from accessible public sources. It does not prove that a company has no China R&amp;D activity.
+      </div>
+    </section>
+  </main>
+</body>
+</html>
